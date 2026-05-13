@@ -1,0 +1,20 @@
+{
+  "name": "nhom4-baitap-fullstack",
+  "version": "1.0.0",
+  "description": "Full-stack authentication application with User, OTP, and Profile management",
+  "private": true,
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ..",
+    "dev": "concurrently \"npm run backend-dev\" \"npm run frontend-dev\"",
+    "backend-dev": "cd backend && npm run dev",
+    "backend-start": "cd backend && npm start",
+    "frontend-dev": "cd frontend && npm run dev",
+    "frontend-build": "cd frontend && npm run build",
+    "frontend-preview": "cd frontend && npm run preview",
+    "frontend-lint": "cd frontend && npm run lint",
+    "build": "npm run frontend-build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

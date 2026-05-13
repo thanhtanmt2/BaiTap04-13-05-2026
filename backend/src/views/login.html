@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - HR Management System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome cho icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            background: white;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .login-body {
+            padding: 40px 30px;
+        }
+        .btn-login {
+            background: #007bff;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+        .form-control {
+            padding: 12px 15px;
+            border-radius: 8px;
+        }
+        .input-group-text {
+            background-color: transparent;
+            border-right: none;
+        }
+        .input-group .form-control {
+            border-left: none;
+        }
+        .input-group-text i {
+            color: #6c757d;
+        }
+        .form-control:focus + .input-group-text i,
+        .input-group-focus {
+            color: #007bff;
+            border-color: #80bdff;
+        }
+        /* Modal quên mật khẩu */
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .otp-input {
+            width: 45px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 5px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+        .otp-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="login-header">
+            <h3><i class="fa-solid fa-briefcase me-2"></i>HR System</h3>
+            <p class="mb-0">Đăng nhập để quản lý nhân sự</p>
+        </div>
+        <div class="login-body">
+            <!-- Form đăng nhập (Chỉ giao diện, chưa nối API đăng nhập vì bạn nói chưa làm API đăng nhập) -->
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold">Tài khoản (Email)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                        <input type="email" class="form-control" placeholder="Nhập email của bạn" required value="user@example.com">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold">Mật khẩu</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" class="form-control" placeholder="Nhập mật khẩu" required value="password123">
+                        <span class="input-group-text" style="border-left: none; border-right: 1px solid #dee2e6; cursor: pointer;" onclick="togglePassword('loginPassword', this)">
+                            <i class="fa-solid fa-eye text-muted"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label text-muted" for="rememberMe">Ghi nhớ tôi</label>
+                    </div>
+                    <a href="#" class="text-decoration-none fw-bold" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Quên mật khẩu?</a>
+                </div>
+                <button type="button" class="btn btn-login btn-primary w-100" onclick="alert('Chức năng đăng nhập đang được xây dựng!')">Đăng Nhập</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Quên Mật Khẩu -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="forgotPasswordModalLabel"><i class="fa-solid fa-key text-primary me-2"></i>Khôi phục mật khẩu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="resetModal()"></button>
+                </div>
+                <div class="modal-body p-4">
+                    
+                    <!-- Alert Message -->
+                    <div id="alertMessage" class="alert d-none" role="alert"></div>
+
+                    <!-- Bước 1: Nhập Email -->
+                    <div id="step1" class="step active">
+                        <p class="text-muted mb-4">Vui lòng nhập email đã đăng ký tài khoản. Chúng tôi sẽ gửi mã xác thực (OTP) cho bạn.</p>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Email</label>
+                            <input type="email" id="forgotEmail" class="form-control form-control-lg" placeholder="Ví dụ: user@example.com">
+                        </div>
+                        <button type="button" class="btn btn-primary w-100 btn-lg fw-bold mt-2" id="btnSendOTP" onclick="sendOTP()">
+                            <span id="btnSendOTPText">Gửi mã OTP</span>
+                            <span id="btnSendOTPSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <!-- Bước 2: Nhập OTP -->
+                    <div id="step2" class="step">
+                        <p class="text-muted mb-4">Mã OTP gồm 6 chữ số đã được gửi tới email <strong id="sentEmailAddress"></strong>. Mã có hiệu lực trong <span class="text-danger fw-bold" id="countdown">05:00</span>.</p>
+                        <div class="d-flex justify-content-center mb-4" id="otpContainer">
+                            <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 'otp2')" onkeydown="moveToPrev(event, this, null)">
+                            <input type="text" class="otp-input" maxlength="1" id="otp2" oninput="moveToNext(this, 'otp3')" onkeydown="moveToPrev(event, this, 'otp1')">
+                            <input type="text" class="otp-input" maxlength="1" id="otp3" oninput="moveToNext(this, 'otp4')" onkeydown="moveToPrev(event, this, 'otp2')">
+                            <input type="text" class="otp-input" maxlength="1" id="otp4" oninput="moveToNext(this, 'otp5')" onkeydown="moveToPrev(event, this, 'otp3')">
+                            <input type="text" class="otp-input" maxlength="1" id="otp5" oninput="moveToNext(this, 'otp6')" onkeydown="moveToPrev(event, this, 'otp4')">
+                            <input type="text" class="otp-input" maxlength="1" id="otp6" oninput="moveToNext(this, null)" onkeydown="moveToPrev(event, this, 'otp5')">
+                        </div>
+                        <button type="button" class="btn btn-primary w-100 btn-lg fw-bold" id="btnVerifyOTP" onclick="verifyOTP()">Xác nhận OTP</button>
+                        <div class="text-center mt-3">
+                            <a href="#" class="text-decoration-none text-muted" id="btnResendOTP" onclick="resendOTP()" style="pointer-events: none; opacity: 0.5;">Gửi lại mã OTP</a>
+                        </div>
+                    </div>
+
+                    <!-- Bước 3: Đặt Mật Khẩu Mới -->
+                    <div id="step3" class="step">
+                        <p class="text-muted mb-4">Vui lòng nhập mật khẩu mới cho tài khoản của bạn.</p>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Mật khẩu mới</label>
+                            <div class="input-group">
+                                <input type="password" id="newPassword" class="form-control" placeholder="Ít nhất 6 ký tự">
+                                <span class="input-group-text" style="cursor: pointer;" onclick="togglePassword('newPassword', this)">
+                                    <i class="fa-solid fa-eye text-muted"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Xác nhận mật khẩu</label>
+                            <div class="input-group">
+                                <input type="password" id="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới">
+                                <span class="input-group-text" style="cursor: pointer;" onclick="togglePassword('confirmPassword', this)">
+                                    <i class="fa-solid fa-eye text-muted"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success w-100 btn-lg fw-bold" id="btnResetPassword" onclick="resetPassword()">
+                            <span id="btnResetPasswordText">Đổi mật khẩu</span>
+                            <span id="btnResetPasswordSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <!-- Bước 4: Thành công -->
+                    <div id="step4" class="step text-center py-4">
+                        <div class="mb-4">
+                            <i class="fa-solid fa-circle-check text-success" style="font-size: 5rem;"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Đổi mật khẩu thành công!</h4>
+                        <p class="text-muted mb-4">Mật khẩu của bạn đã được cập nhật thành công. Bạn có thể sử dụng mật khẩu mới để đăng nhập.</p>
+                        <button type="button" class="btn btn-primary w-100 btn-lg fw-bold" data-bs-dismiss="modal" onclick="resetModal()">Quay lại Đăng nhập</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS và Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api/auth';
+        let userEmail = '';
+        let userOtp = '';
+        let timerInterval;
+
+        // Toggle hiển thị mật khẩu
+        function togglePassword(inputId, iconSpan) {
+            const input = document.getElementById(inputId);
+            const icon = iconSpan.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Chuyển đổi giữa các bước trong Modal
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById('step' + stepNumber).classList.add('active');
+            hideAlert();
+        }
+
+        // Hiển thị thông báo Alert
+        function showAlert(message, type = 'danger') {
+            const alertEl = document.getElementById('alertMessage');
+            alertEl.className = `alert alert-${type}`;
+            alertEl.innerHTML = type === 'danger' ? `<i class="fa-solid fa-circle-exclamation me-2"></i>${message}` : `<i class="fa-solid fa-circle-check me-2"></i>${message}`;
+            alertEl.classList.remove('d-none');
+        }
+
+        function hideAlert() {
+            document.getElementById('alertMessage').classList.add('d-none');
+        }
+
+        // --- BƯỚC 1: GỬI OTP ---
+        async function sendOTP() {
+            const email = document.getElementById('forgotEmail').value.trim();
+            if (!email) {
+                showAlert('Vui lòng nhập địa chỉ email!');
+                return;
+            }
+
+            // UI Loading
+            document.getElementById('btnSendOTPText').classList.add('d-none');
+            document.getElementById('btnSendOTPSpinner').classList.remove('d-none');
+            document.getElementById('btnSendOTP').disabled = true;
+            hideAlert();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    userEmail = email;
+                    document.getElementById('sentEmailAddress').textContent = email;
+                    showStep(2);
+                    startTimer(300); // 5 phút
+                    // Tự động focus ô OTP đầu tiên
+                    setTimeout(() => document.querySelector('.otp-input').focus(), 100);
+                } else {
+                    showAlert(data.message || (data.errors ? data.errors[0].msg : 'Có lỗi xảy ra, vui lòng thử lại!'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Không thể kết nối đến máy chủ.');
+            } finally {
+                // Khôi phục UI
+                document.getElementById('btnSendOTPText').classList.remove('d-none');
+                document.getElementById('btnSendOTPSpinner').classList.add('d-none');
+                document.getElementById('btnSendOTP').disabled = false;
+            }
+        }
+
+        // --- BƯỚC 2: XỬ LÝ NHẬP OTP ---
+        function moveToNext(current, nextFieldId) {
+            current.value = current.value.replace(/[^0-9]/g, ''); // Chỉ cho nhập số
+            if (current.value.length === 1 && nextFieldId) {
+                document.getElementById(nextFieldId).focus();
+            }
+        }
+
+        function moveToPrev(e, current, prevFieldId) {
+            if (e.key === 'Backspace' && current.value === '' && prevFieldId) {
+                document.getElementById(prevFieldId).focus();
+            }
+        }
+
+        function verifyOTP() {
+            const inputs = document.querySelectorAll('.otp-input');
+            let otp = '';
+            inputs.forEach(input => otp += input.value);
+
+            if (otp.length < 6) {
+                showAlert('Vui lòng nhập đầy đủ mã OTP 6 số!');
+                return;
+            }
+            
+            userOtp = otp;
+            // Chuyển sang bước đổi mật khẩu luôn (Backend sẽ kiểm tra OTP ở API reset-password)
+            showStep(3);
+        }
+
+        // Hẹn giờ OTP
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const display = document.getElementById('countdown');
+            const resendBtn = document.getElementById('btnResendOTP');
+            
+            resendBtn.style.pointerEvents = 'none';
+            resendBtn.style.opacity = '0.5';
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    display.textContent = "Hết hạn";
+                    resendBtn.style.pointerEvents = 'auto';
+                    resendBtn.style.opacity = '1';
+                }
+            }, 1000);
+        }
+
+        function resendOTP() {
+            // Lấy lại email và gọi lại hàm sendOTP (bỏ qua giao diện bước 1)
+            document.getElementById('forgotEmail').value = userEmail;
+            
+            // Xóa OTP cũ
+            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+            
+            sendOTP();
+        }
+
+        // --- BƯỚC 3: ĐỔI MẬT KHẨU ---
+        async function resetPassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword.length < 6) {
+                showAlert('Mật khẩu mới phải có ít nhất 6 ký tự!');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showAlert('Xác nhận mật khẩu không khớp!');
+                return;
+            }
+
+            // UI Loading
+            document.getElementById('btnResetPasswordText').classList.add('d-none');
+            document.getElementById('btnResetPasswordSpinner').classList.remove('d-none');
+            document.getElementById('btnResetPassword').disabled = true;
+            hideAlert();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: userEmail,
+                        otp: userOtp,
+                        newPassword: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showStep(4);
+                } else {
+                    showAlert(data.message || (data.errors ? data.errors[0].msg : 'Mã OTP không đúng hoặc đã hết hạn!'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Không thể kết nối đến máy chủ.');
+            } finally {
+                // Khôi phục UI
+                document.getElementById('btnResetPasswordText').classList.remove('d-none');
+                document.getElementById('btnResetPasswordSpinner').classList.add('d-none');
+                document.getElementById('btnResetPassword').disabled = false;
+            }
+        }
+
+        // Reset Modal khi đóng
+        function resetModal() {
+            clearInterval(timerInterval);
+            userEmail = '';
+            userOtp = '';
+            document.getElementById('forgotEmail').value = '';
+            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            hideAlert();
+            showStep(1);
+        }
+    </script>
+</body>
+</html>
