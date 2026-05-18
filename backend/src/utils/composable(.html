@@ -1,0 +1,14 @@
+composable(
+    route = "product/{id}",
+    deepLinks = listOf(
+        navDeepLink {
+            uriPattern = "myapp://product/{id}"
+        }
+    )
+) { backStackEntry ->
+
+    val productId =
+        backStackEntry.arguments?.getString("id")
+
+    ProductScreen(productId)
+}

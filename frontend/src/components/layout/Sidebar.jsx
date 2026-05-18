@@ -22,6 +22,7 @@ const LogoutIcon = () => (
 
 const userNavItems = [
   { label: 'Hồ sơ', path: '/user/profile', icon: <UserCircleIcon /> },
+  { label: 'Cửa hàng', path: '/user/shop', icon: <UsersIcon /> },
 ];
 
 const adminNavItems = [

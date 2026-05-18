@@ -10,6 +10,7 @@ import ForgotPassword from './pages/ForgotPassword';
 
 import DashboardLayout from './components/layout/DashboardLayout';
 import UserProfile from './pages/user/UserProfile';
+import Shop from './pages/Shop';
 import AdminProfile from './pages/admin/AdminProfile';
 import AdminUsers from './pages/admin/AdminUsers';
 import ProtectedRoute from './routes/ProtectedRoute';
@@ -61,6 +62,7 @@ const App = () => {
         }
       >
         <Route path="profile" element={<UserProfile />} />
+        <Route path="shop" element={<Shop />} />
       </Route>
 
       {/* Admin dashboard */}

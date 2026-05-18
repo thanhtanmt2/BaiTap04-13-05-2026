@@ -1,27 +1,27 @@
 require('dotenv').config();
 const { Sequelize } = require('sequelize');
 const createAdminAccount = require('../utils/createAdmin');
+const seedProducts = require('../utils/seedProducts');
 
 const initializeDatabase = async () => {
   try {
-    // Create connection without database to execute CREATE DATABASE
-    const sequelizeAdmin = new Sequelize(
-      '',
-      process.env.DB_USER || 'root',
-      process.env.DB_PASSWORD || '',
-      {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 3306,
-        dialect: 'mysql',
-        logging: false,
-        dialectOptions: {
-          charset: 'utf8mb4',
-        },
-      }
-    );
-
-    // Create database if not exists
     const dbName = process.env.DB_NAME || 'nhom4_baitap';
+    const dbUser = process.env.DB_USER || 'root';
+    const dbPassword = process.env.DB_PASSWORD || '';
+    const dbHost = process.env.DB_HOST || 'localhost';
+    const dbPort = process.env.DB_PORT || 3306;
+
+    // Create connection without database to execute CREATE DATABASE
+    const sequelizeAdmin = new Sequelize('', dbUser, dbPassword, {
+      host: dbHost,
+      port: dbPort,
+      dialect: 'mysql',
+      logging: false,
+      dialectOptions: {
+        charset: 'utf8mb4',
+      },
+    });
+
     await sequelizeAdmin.query(
       `CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
     );
@@ -36,12 +36,12 @@ const initializeDatabase = async () => {
     // Load all models so they are registered before sync
     require('../models/index');
 
-    // Sync models - dung alter:true de tu dong cap nhat schema khi co thay doi
-    await sequelize.sync({ alter: true });
+    // Sync models without destructive changes
+    await sequelize.sync({ force: false });
     console.log('✓ Database da duoc khoi tao thanh cong');
 
-    // Create admin account
     await createAdminAccount();
+    await seedProducts();
   } catch (error) {
     console.error('✗ Lỗi kết nối database:', error.message);
     process.exit(1);

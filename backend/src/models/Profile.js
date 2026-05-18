@@ -12,7 +12,6 @@ const Profile = sequelize.define(
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      unique: true,
       references: {
         model: 'users',
         key: 'id',
@@ -39,6 +38,12 @@ const Profile = sequelize.define(
   {
     tableName: 'profiles',
     timestamps: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ['user_id']
+      }
+    ]
   }
 );
 
